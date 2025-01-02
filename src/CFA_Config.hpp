@@ -73,7 +73,7 @@ When enabled, you are given an event-driven API that allows you to easily implem
 and assign them to a switch on your controller.
 Pro Tip: You can combine the Flight Mode API with the Telemetry API to send flight mode
 information back to your controller. */
-#define CRSF_FLIGHTMODES_ENABLED 0
+#define CRSF_FLIGHTMODES_ENABLED 1
 
 /* Custom Flight Modes
 Enables or disables the Custom Flight Modes.
@@ -96,7 +96,7 @@ and assign them to a switch on your controller. */
 #define CRSF_TELEMETRY_BATTERY_ENABLED      1
 
 #ifndef CRSF_TELEMETRY_FLIGHTMODE_ENABLED
-#define CRSF_TELEMETRY_FLIGHTMODE_ENABLED 0
+#define CRSF_TELEMETRY_FLIGHTMODE_ENABLED 1
 #endif
 
 #define CRSF_TELEMETRY_GPS_ENABLED 1
@@ -110,7 +110,7 @@ and assign them to a switch on your controller. */
 - CRSF_DEBUG_ENABLE_CONFIGURATION_DUMP: When enabled, this will print the configuration of CFA to the Serial Monitor.*/
 #define CRSF_DEBUG_SERIAL_PORT                       Serial
 #define CRSF_DEBUG_ENABLE_COMPATIBILITY_TABLE_OUTPUT 0
-#define CRSF_DEBUG_ENABLE_CONFIGURATION_DUMP         0
+#define CRSF_DEBUG_ENABLE_CONFIGURATION_DUMP         1
 
 /* All warnings and asserts below this point are to ensure that the configuration is valid. */
 

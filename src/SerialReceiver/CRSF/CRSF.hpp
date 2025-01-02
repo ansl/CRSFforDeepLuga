@@ -27,6 +27,7 @@
 #include "../CRC/CRC.hpp"
 #include "CRSFProtocol.hpp"
 
+
 namespace serialReceiverLayer
 {
     typedef struct link_statistics_s
@@ -63,12 +64,16 @@ namespace serialReceiverLayer
         void getFailSafe(bool *failSafe);
         void getRcChannels(uint16_t *rcChannels);
         void getLinkStatistics(link_statistics_t *linkStats);
-
+        crsfProtocol::frame_t txFrame;//luengoa
+        uint32_t bdrate;//luengoa
+        bool rx_answer=0;//luengoa
+        bool BR_change=0;//luengoa
       private:
         bool rcFrameReceived;
         uint16_t frameCount;
         uint32_t timePerFrame;
         crsfProtocol::frame_t rxFrame;
+        // crsfProtocol::frame_t txFrame;//luengoa
         crsfProtocol::frame_t rcChannelsFrame;
         link_statistics_t linkStatistics;
         genericCrc::GenericCRC *crc8 = nullptr;

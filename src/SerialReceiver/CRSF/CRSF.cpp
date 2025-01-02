@@ -23,8 +23,9 @@
  */
 
 #include "CRSF.hpp"
+#include "../CRC/CRC_test.hpp"
 #include "Arduino.h"
-
+//luengoa
 using namespace crsfProtocol;
 using namespace genericCrc;
 
@@ -32,6 +33,7 @@ namespace serialReceiverLayer
 {
     CRSF::CRSF()
     {
+
         rcFrameReceived = false;
         frameCount = 0;
         timePerFrame = 0;
@@ -61,7 +63,7 @@ namespace serialReceiverLayer
 
             memcpy(rxFrame.raw, crsf.rxFrame.raw, CRSF_FRAME_SIZE_MAX);
             memcpy(rcChannelsFrame.raw, crsf.rcChannelsFrame.raw, CRSF_FRAME_SIZE_MAX);
-
+            memcpy(txFrame.raw, crsf.txFrame.raw, CRSF_FRAME_SIZE_MAX);
             *crc8 = *crsf.crc8;
         }
 
@@ -102,76 +104,178 @@ namespace serialReceiverLayer
 
     bool CRSF::receiveFrames(uint8_t rxByte)
     {
+        static bool frameReading = 0;
         static uint8_t framePosition = 0;
         static uint32_t frameStartTime = 0;
         const uint32_t currentTime = micros();
 
-        /* Reset the frame position if the frame time has expired. */
-        if (currentTime - frameStartTime > timePerFrame)
+        if (rxByte == CRSF_ADDRESS_FLIGHT_CONTROLLER && framePosition == 0 && frameReading == 0) //|| currentTime - frameStartTime > timePerFrame)
         {
+            frameReading = 1;
             framePosition = 0;
-
+            frameStartTime = currentTime;
+            memset(rxFrame.raw, 0, CRSF_FRAME_SIZE_MAX);
             if (currentTime < frameStartTime)
             {
                 frameStartTime = currentTime;
             }
         }
-
-        if (framePosition == 0)
+        if (frameReading)
         {
-            frameStartTime = currentTime;
-        }
+            const int fullFrameLength = framePosition < 3 ? 5 : min(rxFrame.frame.frameLength + CRSF_FRAME_LENGTH_ADDRESS + CRSF_FRAME_LENGTH_FRAMELENGTH, (int)CRSF_FRAME_SIZE_MAX);
 
-        /* Assume the full frame length is 5 bytes until the frame length byte is received. */
-        const int fullFrameLength = framePosition < 3 ? 5 : min(rxFrame.frame.frameLength + CRSF_FRAME_LENGTH_ADDRESS + CRSF_FRAME_LENGTH_FRAMELENGTH, (int)CRSF_FRAME_SIZE_MAX);
+            // Serial.printf("%2X ; %d; %d ; %d ;%d\n", rxByte, framePosition, fullFrameLength, currentTime - frameStartTime, timePerFrame);
+            // if (rxByte == 0xc8)
+            // {
+            //     Serial.println("xxxxxxxxxxxxxxxxxxxxxxx");
+            // }
+            // if (rxByte == 0x28)
+            // {
+            //     Serial.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+            // }
+            /* Assume the full frame length is 5 bytes until the frame length byte is received. */
 
-        if (framePosition < fullFrameLength)
-        {
-            /* Store the received byte in the frame buffer. */
-            rxFrame.raw[framePosition] = rxByte;
-            framePosition++;
-
-            if (framePosition >= fullFrameLength)
+            if (framePosition < fullFrameLength)
             {
-                /* Frame is complete, calculate the CRC and check if it is valid. */
-                const uint8_t crc = calculateFrameCRC();
+                /* Store the received byte in the frame buffer. */
+                // if(rxByte==0x78){
+                //             Serial.printf("%X\n",rxByte);
+                // }
+                rxFrame.raw[framePosition] = rxByte;
+                framePosition++;
 
-                if (crc == rxFrame.raw[fullFrameLength - 1])
+                if (framePosition >= fullFrameLength)
                 {
-                    switch (rxFrame.frame.type)
+                    /* Frame is complete, calculate the CRC and check if it is valid. */
+                    const uint8_t crc = calculateFrameCRC();
+                    if (rxFrame.frame.type != CRSF_FRAMETYPE_RC_CHANNELS_PACKED)
                     {
-                        case crsfProtocol::CRSF_FRAMETYPE_RC_CHANNELS_PACKED:
-                            if (rxFrame.frame.deviceAddress == CRSF_ADDRESS_FLIGHT_CONTROLLER)
-                            {
-                                memcpy(&rcChannelsFrame, &rxFrame, CRSF_FRAME_SIZE_MAX);
-                                rcFrameReceived = true;
-                            }
-                            break;
+                        for (int i = 0; i < fullFrameLength; i++)
+                        {
+                            Serial.printf("%X ", rxFrame.raw[i]);
+                        }
+                        Serial.println();
+                    }
+
+                    if (crc == rxFrame.raw[fullFrameLength - 1])
+                    {
+                        //  Serial.printf("Received FRAME %x \n",rxFrame.frame.type);
+                        switch (rxFrame.frame.type)
+                        {
+                            case crsfProtocol::CRSF_FRAMETYPE_RC_CHANNELS_PACKED:
+                                if (rxFrame.frame.deviceAddress == CRSF_ADDRESS_FLIGHT_CONTROLLER)
+                                {
+                                    memcpy(&rcChannelsFrame, &rxFrame, CRSF_FRAME_SIZE_MAX);
+                                    rcFrameReceived = true;
+                                }
+                                // Serial.printf("Received: CRSF_FRAMETYPE_RC_CHANNELS_PACKED \n");
+                                break;
 
 #if CRSF_LINK_STATISTICS_ENABLED > 0
-                        case CRSF_FRAMETYPE_LINK_STATISTICS:
-                            if ((rxFrame.frame.deviceAddress == CRSF_ADDRESS_FLIGHT_CONTROLLER) && (rxFrame.frame.frameLength == CRSF_FRAME_ORIGIN_DEST_SIZE + CRSF_FRAME_LINK_STATISTICS_PAYLOAD_SIZE))
-                            {
-                                crsf_payload_link_statistics_t linkStatisticsPayload;
-                                memcpy(&linkStatisticsPayload, rxFrame.frame.payload, sizeof(crsf_payload_link_statistics_t));
+                            case CRSF_FRAMETYPE_LINK_STATISTICS:
+                                if ((rxFrame.frame.deviceAddress == CRSF_ADDRESS_FLIGHT_CONTROLLER) && (rxFrame.frame.frameLength == CRSF_FRAME_ORIGIN_DEST_SIZE + CRSF_FRAME_LINK_STATISTICS_PAYLOAD_SIZE))
+                                {
+                                    crsf_payload_link_statistics_t linkStatisticsPayload;
+                                    memcpy(&linkStatisticsPayload, rxFrame.frame.payload, sizeof(crsf_payload_link_statistics_t));
 
-                                linkStatistics.rssi = (linkStatisticsPayload.active_antenna ? linkStatisticsPayload.uplink_rssi_2 : linkStatisticsPayload.uplink_rssi_1);
-                                linkStatistics.lqi = linkStatisticsPayload.uplink_link_quality;
-                                linkStatistics.snr = linkStatisticsPayload.uplink_snr;
-                                linkStatistics.tx_power = (linkStatisticsPayload.uplink_tx_power < 9) ? tx_power_table[linkStatisticsPayload.uplink_tx_power] : 0;
-                            }
-                            break;
+                                    linkStatistics.rssi = (linkStatisticsPayload.active_antenna ? linkStatisticsPayload.uplink_rssi_2 : linkStatisticsPayload.uplink_rssi_1);
+                                    linkStatistics.lqi = linkStatisticsPayload.uplink_link_quality;
+                                    linkStatistics.snr = linkStatisticsPayload.uplink_snr;
+                                    linkStatistics.tx_power = (linkStatisticsPayload.uplink_tx_power < 9) ? tx_power_table[linkStatisticsPayload.uplink_tx_power] : 0;
+                                }
+                                // Serial.printf("Received: CRSF_FRAMETYPE_LINK_STATISTICS \n");
+                                break;
 #endif
-                    }
-                }
+                                // case CRSF_FRAMETYPE_COMMAND: //luengoa
+                                //     Serial.printf("Received FRAME %X \n", rxFrame.frame.type);
+                                //     Serial.printf("Received CMD %X \n", rxFrame.frame.payload[2]);
+                                //     Serial.printf("Received subCMD %X \n", rxFrame.frame.payload[3]);
+                                //     if (rxFrame.frame.payload[2] == 0x0A && rxFrame.frame.payload[3] == 0x70)
+                                //     {                                                     //luengoa
+                                //         Serial.println("BR NEgotiation");                 //luengoa
+                                //         rx_answer = 1;                                    //luengoa
+                                //         bdrate = 0x00000000;                              //luengoa
+                                //         bdrate = bdrate | rxFrame.frame.payload[5] << 24; //luengoa
+                                //         bdrate = bdrate | rxFrame.frame.payload[6] << 16; //luengoa
+                                //         bdrate = bdrate | rxFrame.frame.payload[7] << 8;  //luengoa
+                                //         bdrate = bdrate | rxFrame.frame.payload[8] << 0;  //luengoa
+                                //         Serial.printf("Proposed BR: %d \n", bdrate);
+                                //         if (bdrate > 416666)
+                                //         // if (bdrate > 1000000)
+                                //         {
 
-                /* Clear the frame buffer and reset the frame position. */
-                memset(rxFrame.raw, 0, CRSF_FRAME_SIZE_MAX);
-                framePosition = 0;
-                return true;
+                                //             uint8_t bff[] = {0xC8, 0x09, 0x32, 0xEC, 0xC8, 0x0A, 0x71, 0x00, 0x00, 0x00, 0x00}; //luengoa
+                                //             bff[9] = crc8_ba(&bff[2], 7);                                                       //luengoa
+                                //             bff[10] = crc8_5D(&bff[2], 8);                                                      //luengoa
+                                //             memcpy(txFrame.raw, bff, 11);                                                       //luengoa
+
+                                //             // Serial1->write(bff,12);
+                                //             Serial.println("BR proposal rejected"); //luengoa
+                                //             for (int i = 0; i < 11; i++)
+                                //             {
+                                //                 Serial.printf("%2X ", txFrame.raw[i]);
+                                //             }
+                                //             Serial.println();
+                                //         }
+                                //         else
+                                //         {
+                                //             uint8_t bff[] = {0xC8, 0x09, 0x32, 0xEC, 0xC8, 0x0A, 0x71, 0x00, 0x01, 0x00, 0x00}; //luengoa
+                                //             bff[9] = crc8_ba(&bff[2], 7);                                                       //luengoa
+                                //             bff[10] = crc8_5D(&bff[2], 8);                                                      //luengoa
+                                //             memcpy(txFrame.raw, bff, 11);                                                       //luengoa
+                                //             // Serial1->write(bff,12);
+                                //             Serial.println("BR proposal Approved"); //luengoa
+                                //             for (int i = 0; i < 11; i++)
+                                //             {
+                                //                 Serial.printf("%2X ", txFrame.raw[i]);
+                                //             }
+                                //             Serial.println();
+                                //             BR_change = 1;
+                                //         }
+                                //     }
+                                //     else if (rxFrame.frame.payload[2] == 0xFF && rxFrame.frame.payload[3] == 0x0A)
+                                //     {
+                                //         rx_answer = 1;
+                                //         uint8_t bff[] = {0xC8, 0x0A, 0x32, 0xEC, 0xC8, 0xFF, 0x0A, 0x71, 0x01, 0x00, 0x00, 0x00}; //luengoa
+                                //         bff[10] = crc8_ba(&bff[2], 8);                                                            //luengoa
+                                //         bff[11] = crc8_5D(&bff[2], 9);                                                            //luengoa
+                                //         memcpy(txFrame.raw, bff, 12);                                                             //luengoa
+                                //         // Serial1->write(bff,12);
+                                //         Serial.println("BR change ACK"); //luengoa
+                                //         for (int i = 0; i < 11; i++)
+                                //         {
+                                //             Serial.printf("%2X ", txFrame.raw[i]);
+                                //         }
+                                //         Serial.println();
+                                //     }
+                                //     break;
+
+                            case CRSF_FRAMETYPE_DEVICE_PING:
+                                {
+                                    Serial.printf("Received FRAME %X received \n", rxFrame.frame.type);
+                                    rx_answer = 1;
+                                    uint8_t bff[29] = {0xC8, 0x00, 0x29, 0xEA, 0xC8, 0x44, 0x65, 0x65, 0x70, 0x4C, 0x75, 0x67, 0x61, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00}; //luengoa
+                                    // bff[10] = crc8_ba(&bff[2], 8);   
+                                    bff[1]=sizeof(bff)-2;                                                         //luengoa
+                                    bff[sizeof(bff) - 1] = crc8_5D(&bff[2], sizeof(bff) - 3); //luengoa
+                                    memcpy(txFrame.raw, bff, sizeof(bff));
+                                }
+                                //luengoa
+
+                                break;
+                            default:
+                                Serial.printf("Received FRAME %X received\n", rxFrame.frame.type);
+                        }
+                    }
+
+                    /* Clear the frame buffer and reset the frame position. */
+                    memset(rxFrame.raw, 0, CRSF_FRAME_SIZE_MAX);
+                    framePosition = 0;
+                    frameReading = 0;
+                    return true;
+                }
             }
         }
-
         return false;
     }
 

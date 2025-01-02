@@ -25,6 +25,7 @@
 #include "SerialReceiver.hpp"
 #include "../hal/CompatibilityTable/CompatibilityTable.hpp"
 #include "Arduino.h"
+// #include "CRC/CRC_test.hpp"//luengoa
 
 using namespace crsfProtocol;
 using namespace hal;
@@ -314,7 +315,7 @@ namespace serialReceiverLayer
         /* Initialise the CRSF Protocol and Telemetry. */
         crsf = new CRSF();
         crsf->begin();
-        crsf->setFrameTime(baudRate, 10);
+        crsf->setFrameTime(baudRate, 20);
 #if defined(ARDUINO_ARCH_ESP32)
         _uart->begin(baudRate, SERIAL_8N1, _rxPin, _txPin);
 #else
@@ -482,6 +483,41 @@ namespace serialReceiverLayer
         CRSF_DEBUG_SERIAL_PORT.println();
         CRSF_DEBUG_SERIAL_PORT.flush();
 #endif
+
+        // uint8_t bff[]={0xC8,0x05,0x7D,0xEA,0xC8,0x02,0xAB};//luengoa
+        // _uart->write(bff,7);//luengoa
+        // Serial.printf("%#X:%#X:%#X:%#X:%#X:%#X:%#X\n",bff[0],bff[1],bff[2],bff[3],bff[4],bff[5],bff[6]);//luengoa
+        // Serial.println(_uart->baudRate());//luengoa
+        ////BIND//luengoa
+        // uint8_t bff[]={0xC8,0x07,0x32,0xEC,0xC8,0x10,0x01,0x9E,0xE8};//luengoa
+  
+        // _uart->write(bff,9);//luengoa
+        // Serial.printf("%#X:%#X:%#X:%#X:%#X:%#X:%#X:%#X:%#X\n",bff[0],bff[1],bff[2],bff[3],bff[4],bff[5],bff[6],bff[7],bff[8]);//luengoa
+        //TEST FRAME//luengoa
+
+        // uint8_t bff[]={0xC8,0x0A,0x32,0xEC,0xC8,0x20,0x01,0x28,0x00,0x00,0x00,0x00};//luengoa
+        // _uart->write(bff,9);//luengoa
+        // uint8_t crc__BA=crc8_ba(&bff[2], 8);//luengoa
+        // uint8_t crc__5D=crc8_5D(&bff[2], 9);//luengoa
+        // bff[10]=crc8_ba(&bff[2], 8);//luengoa
+        // bff[11]=crc8_5D(&bff[2], 9);//luengoa
+        // Serial.println(bff[10],HEX);//luengoa
+        // Serial.println(bff[11],HEX);//luengoa
+        // _uart->write(bff,12);//luengoa
+
+        //DEVICE INFO//luengoa
+        // uint8_t bff[]={0xC8,0x0A,0x32,0xEC,0xC8,0x20,0x01,0x28,0x00,0x00,0x00,0x00};//luengoa
+        // _uart->write(bff,9);//luengoa
+        // uint8_t crc__BA=crc8_ba(&bff[2], 8);//luengoa
+        // uint8_t crc__5D=crc8_5D(&bff[2], 9);//luengoa
+        // bff[10]=crc8_ba(&bff[2], 8);//luengoa
+        // bff[11]=crc8_5D(&bff[2], 9);//luengoa
+        // Serial.println(bff[10],HEX);//luengoa
+        // Serial.println(bff[11],HEX);//luengoa
+        // _uart->write(bff,12);//luengoa
+
+
+        
         return true;
     }
 
@@ -524,7 +560,7 @@ namespace serialReceiverLayer
         {
             if (crsf->receiveFrames((uint8_t)_uart->read()))
             {
-                flushRemainingFrames();
+                // flushRemainingFrames();
 
 #if CRSF_LINK_STATISTICS_ENABLED > 0
                 crsf->getLinkStatistics(&_linkStatistics);
@@ -537,8 +573,16 @@ namespace serialReceiverLayer
 #if CRSF_TELEMETRY_ENABLED > 0
                 if (telemetry->update())
                 {
-                    telemetry->sendTelemetryData(_uart);
+                    telemetry->sendTelemetryData(_uart);   
                 }
+                // ANSWER TO RX request //luengoa
+                if (crsf->rx_answer==1){//luengoa
+                Serial.println("SENDING......");//luengoa
+                    _uart->write(crsf->txFrame.raw,sizeof(crsf->txFrame.raw)); //luengoa
+                    Serial.println("ANSWER SENT");//luengoa
+                    crsf->rx_answer=0;
+                }//luengoa
+
 #endif
 
 #if CRSF_RC_ENABLED > 0

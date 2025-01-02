@@ -66,6 +66,7 @@ namespace serialReceiverLayer
         void _appendFlightModeData();
   #endif
         void _appendGPSData();
+        void _appendHeartBeatData();
         void _finaliseFrame();
     };
 } // namespace serialReceiverLayer

@@ -75,6 +75,9 @@ namespace serialReceiverLayer
 #if CRSF_TELEMETRY_ENABLED > 0 && CRSF_TELEMETRY_GPS_ENABLED > 0
         _telemetryFrameSchedule[index++] = (1 << CRSF_TELEMETRY_FRAME_GPS_INDEX);
 #endif
+#if CRSF_TELEMETRY_ENABLED > 0
+        _telemetryFrameSchedule[index++] = (1 << CRSF_TELEMETRY_FRAME_HEARTBEAT_INDEX);
+#endif
 
         _telemetryFrameScheduleCount = index;
     }
@@ -141,6 +144,14 @@ namespace serialReceiverLayer
             sendFrame = true;
         }
 #endif
+
+        if (currentSchedule & (1 << CRSF_TELEMETRY_FRAME_HEARTBEAT_INDEX))
+        {
+            _initialiseFrame();
+            _appendHeartBeatData();
+            _finaliseFrame();
+            sendFrame = true;
+        }
 
         scheduleIndex = (scheduleIndex + 1) % _telemetryFrameScheduleCount;
 
@@ -312,7 +323,12 @@ namespace serialReceiverLayer
         SerialBuffer::writeU16BE(_telemetryData.gps.altitude);
         SerialBuffer::writeU8(_telemetryData.gps.satellites);
     }
-
+    void Telemetry::_appendHeartBeatData()
+    {
+        SerialBuffer::writeU8(CRSF_FRAME_HEARTBEAT_PAYLOAD_SIZE + CRSF_FRAME_LENGTH_TYPE_CRC);
+        SerialBuffer::writeU8(CRSF_FRAMETYPE_HEARTBEAT);
+        SerialBuffer::writeU8(CRSF_ADDRESS_FLIGHT_CONTROLLER);
+    }
     void Telemetry::_finaliseFrame()
     {
         uint8_t *buffer = SerialBuffer::getBuffer();
