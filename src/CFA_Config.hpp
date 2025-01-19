@@ -91,8 +91,8 @@ and assign them to a switch on your controller. */
 - TELEMETRY_SIMULATE_ARBITRARY_VALUES: When enabled, arbitrary values are sent for telemetry. */
 #define CRSF_TELEMETRY_ENABLED 1
 
-#define CRSF_TELEMETRY_ATTITUDE_ENABLED     1
-#define CRSF_TELEMETRY_BAROALTITUDE_ENABLED 1
+#define CRSF_TELEMETRY_ATTITUDE_ENABLED     0
+#define CRSF_TELEMETRY_BAROALTITUDE_ENABLED 0
 #define CRSF_TELEMETRY_BATTERY_ENABLED      1
 
 #ifndef CRSF_TELEMETRY_FLIGHTMODE_ENABLED
@@ -110,7 +110,7 @@ and assign them to a switch on your controller. */
 - CRSF_DEBUG_ENABLE_CONFIGURATION_DUMP: When enabled, this will print the configuration of CFA to the Serial Monitor.*/
 #define CRSF_DEBUG_SERIAL_PORT                       Serial
 #define CRSF_DEBUG_ENABLE_COMPATIBILITY_TABLE_OUTPUT 0
-#define CRSF_DEBUG_ENABLE_CONFIGURATION_DUMP         1
+#define CRSF_DEBUG_ENABLE_CONFIGURATION_DUMP         0
 
 /* All warnings and asserts below this point are to ensure that the configuration is valid. */
 

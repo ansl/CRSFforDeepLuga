@@ -76,7 +76,7 @@ namespace serialReceiverLayer
         _uart = hwUartPort;
 
 #if defined(ARDUINO_ARCH_ESP32)
-        #if defined(D0)
+#if defined(D0)
         _rxPin = D0;
 #else
         _rxPin = 0;
@@ -337,7 +337,6 @@ namespace serialReceiverLayer
 #if CRSF_DEBUG_ENABLED > 0
         CRSF_DEBUG_SERIAL_PORT.println("Done.");
 
-
 #if CRSF_DEBUG_ENABLE_CONFIGURATION_DUMP > 0
         for (int i = 0; i < 93; i++)
         {
@@ -394,7 +393,7 @@ namespace serialReceiverLayer
 #else
         CRSF_DEBUG_SERIAL_PORT.println("No");
 #endif
-            
+
         CRSF_DEBUG_SERIAL_PORT.print("     - Initialise Throttle channel: ");
 #if CRSF_RC_INITIALISE_THROTTLECHANNEL > 0
         CRSF_DEBUG_SERIAL_PORT.println("Yes");
@@ -425,7 +424,6 @@ namespace serialReceiverLayer
         CRSF_DEBUG_SERIAL_PORT.println();
         CRSF_DEBUG_SERIAL_PORT.flush();
 
-
         CRSF_DEBUG_SERIAL_PORT.println(" - Telemetry API:");
         CRSF_DEBUG_SERIAL_PORT.print("   - Enabled: ");
 #if CRSF_TELEMETRY_ENABLED > 0
@@ -437,21 +435,21 @@ namespace serialReceiverLayer
 #else
         CRSF_DEBUG_SERIAL_PORT.println("No");
 #endif
-            
+
         CRSF_DEBUG_SERIAL_PORT.print("     - Barometric altitude telemetry enabled: ");
 #if CRSF_TELEMETRY_BAROALTITUDE_ENABLED > 0
         CRSF_DEBUG_SERIAL_PORT.println("Yes");
 #else
         CRSF_DEBUG_SERIAL_PORT.println("No");
 #endif
-                
+
         CRSF_DEBUG_SERIAL_PORT.print("     - Battery telemetry enabled: ");
 #if CRSF_TELEMETRY_BATTERY_ENABLED > 0
         CRSF_DEBUG_SERIAL_PORT.println("Yes");
 #else
         CRSF_DEBUG_SERIAL_PORT.println("No");
 #endif
-                    
+
         CRSF_DEBUG_SERIAL_PORT.print("     - Flight Mode telemetry enabled: ");
 #if CRSF_TELEMETRY_FLIGHTMODE_ENABLED > 0
         CRSF_DEBUG_SERIAL_PORT.println("Yes");
@@ -490,7 +488,7 @@ namespace serialReceiverLayer
         // Serial.println(_uart->baudRate());//luengoa
         ////BIND//luengoa
         // uint8_t bff[]={0xC8,0x07,0x32,0xEC,0xC8,0x10,0x01,0x9E,0xE8};//luengoa
-  
+
         // _uart->write(bff,9);//luengoa
         // Serial.printf("%#X:%#X:%#X:%#X:%#X:%#X:%#X:%#X:%#X\n",bff[0],bff[1],bff[2],bff[3],bff[4],bff[5],bff[6],bff[7],bff[8]);//luengoa
         //TEST FRAME//luengoa
@@ -516,8 +514,6 @@ namespace serialReceiverLayer
         // Serial.println(bff[11],HEX);//luengoa
         // _uart->write(bff,12);//luengoa
 
-
-        
         return true;
     }
 
@@ -571,17 +567,22 @@ namespace serialReceiverLayer
 #endif
 
 #if CRSF_TELEMETRY_ENABLED > 0
-                if (telemetry->update())
-                {
-                    telemetry->sendTelemetryData(_uart);   
-                }
+
                 // ANSWER TO RX request //luengoa
-                if (crsf->rx_answer==1){//luengoa
-                Serial.println("SENDING......");//luengoa
-                    _uart->write(crsf->txFrame.raw,sizeof(crsf->txFrame.raw)); //luengoa
-                    Serial.println("ANSWER SENT");//luengoa
-                    crsf->rx_answer=0;
-                }//luengoa
+                if (crsf->rx_answer == 1)
+                {                                                               //luengoa
+                    Serial.println("SENDING......");                            //luengoa
+                    _uart->write(crsf->txFrame.raw, sizeof(crsf->txFrame.raw)); //luengoa
+                    Serial.println("ANSWER SENT");                              //luengoa
+                    crsf->rx_answer = 0;
+                }
+                else
+                {
+                    if (telemetry->update())
+                    {
+                        telemetry->sendTelemetryData(_uart);
+                    }
+                } //luengoa
 
 #endif
 

@@ -116,7 +116,11 @@ namespace crsfProtocol
         CRSF_FRAMETYPE_MSP_RESP = 0x7B,
         CRSF_FRAMETYPE_MSP_WRITE = 0x7C,
         CRSF_FRAMETYPE_DISPLAYPORT_CMD = 0x7D,
-        CRSF_FRAMETYPE_DEEPLUGA = 0x78,
+        
+        
+        CRSF_FRAMETYPE_BARBUS_SEND_PERI = 0xAD, // [sync] [len] [0xAD] [Total Chucks] [chuckN] [ncoords] [coord 1 LAT Coord 1 LON].....................[coord n LAT Coord n LON] [crc8]
+        CRSF_FRAMETYPE_BARBUS_COMMAND   = 0xAE, // [sync] [len] [0xAD] [Total Chucks] [chuckN] [ncoords] [coord 1 LAT Coord 1 LON].....................[coord n LAT Coord n LON] [crc8]
+        CRSF_FRAMETYPE_BARBUS_ACK       = 0xAF, // [sync] [len] [type] [payload] [crc8]
     } frameType_t;
 
 #if CRSF_TELEMETRY_ENABLED == 1 || CRSF_LINK_STATISTICS_ENABLED == 1

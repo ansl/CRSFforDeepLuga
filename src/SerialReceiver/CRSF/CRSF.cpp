@@ -25,6 +25,7 @@
 #include "CRSF.hpp"
 #include "../CRC/CRC_test.hpp"
 #include "Arduino.h"
+#include <cstdlib>
 //luengoa
 using namespace crsfProtocol;
 using namespace genericCrc;
@@ -148,7 +149,7 @@ namespace serialReceiverLayer
                 {
                     /* Frame is complete, calculate the CRC and check if it is valid. */
                     const uint8_t crc = calculateFrameCRC();
-                    if (rxFrame.frame.type != CRSF_FRAMETYPE_RC_CHANNELS_PACKED)
+                    if (rxFrame.frame.type != CRSF_FRAMETYPE_RC_CHANNELS_PACKED && rxFrame.frame.type != CRSF_FRAMETYPE_LINK_STATISTICS)
                     {
                         for (int i = 0; i < fullFrameLength; i++)
                         {
@@ -259,6 +260,25 @@ namespace serialReceiverLayer
                                     bff[1]=sizeof(bff)-2;                                                         //luengoa
                                     bff[sizeof(bff) - 1] = crc8_5D(&bff[2], sizeof(bff) - 3); //luengoa
                                     memcpy(txFrame.raw, bff, sizeof(bff));
+                                }
+                                break;
+                            case CRSF_FRAMETYPE_BARBUS_SEND_PERI:
+                                {
+                                    Serial.printf("Received FRAME %X received \n", rxFrame.frame.type);
+                                    
+                                    double coord[5][2];
+                                    memset (coord,0,10*sizeof(double)); 
+                                    memcpy(coord,&rxFrame.raw[7],10*sizeof(double));
+                                    // coord=*reinterpret_cast<const double*>(&rxFrame.raw[5])
+                                    rx_answer = 1;
+                                    uint8_t bff[29] = {0xC8, 0x00, CRSF_FRAMETYPE_BARBUS_ACK, CRSF_ADDRESS_RADIO_TRANSMITTER,CRSF_ADDRESS_FLIGHT_CONTROLLER,CRSF_FRAMETYPE_BARBUS_SEND_PERI, rxFrame.raw[6], 0x00}; //luengoa -- [sync] [len] [type] [DEST] [ORIG] [COMMAND to ACK] [CHUNK_N][payload] [crc8]
+                                    bff[1]=sizeof(bff)-2; //luengoa
+                                    bff[sizeof(bff) - 1] = crc8_5D(&bff[2], sizeof(bff) - 3); //luengoa
+                                    memcpy(txFrame.raw, bff, sizeof(bff));
+
+                                    Serial.printf("Received coords  lat=%1.7f  lon=%1.7f  lat=%1.7f  lon=%1.7f  \n", coord[0][0],coord[0][1], coord[1][0],coord[1][1]);
+
+
                                 }
                                 //luengoa
 
