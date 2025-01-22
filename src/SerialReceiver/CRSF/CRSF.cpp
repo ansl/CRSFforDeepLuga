@@ -187,71 +187,7 @@ namespace serialReceiverLayer
                                 // Serial.printf("Received: CRSF_FRAMETYPE_LINK_STATISTICS \n");
                                 break;
 #endif
-                                // case CRSF_FRAMETYPE_COMMAND: //luengoa
-                                //     Serial.printf("Received FRAME %X \n", rxFrame.frame.type);
-                                //     Serial.printf("Received CMD %X \n", rxFrame.frame.payload[2]);
-                                //     Serial.printf("Received subCMD %X \n", rxFrame.frame.payload[3]);
-                                //     if (rxFrame.frame.payload[2] == 0x0A && rxFrame.frame.payload[3] == 0x70)
-                                //     {                                                     //luengoa
-                                //         Serial.println("BR NEgotiation");                 //luengoa
-                                //         rx_answer = 1;                                    //luengoa
-                                //         bdrate = 0x00000000;                              //luengoa
-                                //         bdrate = bdrate | rxFrame.frame.payload[5] << 24; //luengoa
-                                //         bdrate = bdrate | rxFrame.frame.payload[6] << 16; //luengoa
-                                //         bdrate = bdrate | rxFrame.frame.payload[7] << 8;  //luengoa
-                                //         bdrate = bdrate | rxFrame.frame.payload[8] << 0;  //luengoa
-                                //         Serial.printf("Proposed BR: %d \n", bdrate);
-                                //         if (bdrate > 416666)
-                                //         // if (bdrate > 1000000)
-                                //         {
-
-                                //             uint8_t bff[] = {0xC8, 0x09, 0x32, 0xEC, 0xC8, 0x0A, 0x71, 0x00, 0x00, 0x00, 0x00}; //luengoa
-                                //             bff[9] = crc8_ba(&bff[2], 7);                                                       //luengoa
-                                //             bff[10] = crc8_5D(&bff[2], 8);                                                      //luengoa
-                                //             memcpy(txFrame.raw, bff, 11);                                                       //luengoa
-
-                                //             // Serial1->write(bff,12);
-                                //             Serial.println("BR proposal rejected"); //luengoa
-                                //             for (int i = 0; i < 11; i++)
-                                //             {
-                                //                 Serial.printf("%2X ", txFrame.raw[i]);
-                                //             }
-                                //             Serial.println();
-                                //         }
-                                //         else
-                                //         {
-                                //             uint8_t bff[] = {0xC8, 0x09, 0x32, 0xEC, 0xC8, 0x0A, 0x71, 0x00, 0x01, 0x00, 0x00}; //luengoa
-                                //             bff[9] = crc8_ba(&bff[2], 7);                                                       //luengoa
-                                //             bff[10] = crc8_5D(&bff[2], 8);                                                      //luengoa
-                                //             memcpy(txFrame.raw, bff, 11);                                                       //luengoa
-                                //             // Serial1->write(bff,12);
-                                //             Serial.println("BR proposal Approved"); //luengoa
-                                //             for (int i = 0; i < 11; i++)
-                                //             {
-                                //                 Serial.printf("%2X ", txFrame.raw[i]);
-                                //             }
-                                //             Serial.println();
-                                //             BR_change = 1;
-                                //         }
-                                //     }
-                                //     else if (rxFrame.frame.payload[2] == 0xFF && rxFrame.frame.payload[3] == 0x0A)
-                                //     {
-                                //         rx_answer = 1;
-                                //         uint8_t bff[] = {0xC8, 0x0A, 0x32, 0xEC, 0xC8, 0xFF, 0x0A, 0x71, 0x01, 0x00, 0x00, 0x00}; //luengoa
-                                //         bff[10] = crc8_ba(&bff[2], 8);                                                            //luengoa
-                                //         bff[11] = crc8_5D(&bff[2], 9);                                                            //luengoa
-                                //         memcpy(txFrame.raw, bff, 12);                                                             //luengoa
-                                //         // Serial1->write(bff,12);
-                                //         Serial.println("BR change ACK"); //luengoa
-                                //         for (int i = 0; i < 11; i++)
-                                //         {
-                                //             Serial.printf("%2X ", txFrame.raw[i]);
-                                //         }
-                                //         Serial.println();
-                                //     }
-                                //     break;
-
-                            case CRSF_FRAMETYPE_DEVICE_PING:
+                            case CRSF_FRAMETYPE_DEVICE_PING: //luengoa
                                 {
                                     Serial.printf("Received FRAME %X received \n", rxFrame.frame.type);
                                     rx_answer = 1;
@@ -262,7 +198,7 @@ namespace serialReceiverLayer
                                     memcpy(txFrame.raw, bff, sizeof(bff));
                                 }
                                 break;
-                            case CRSF_FRAMETYPE_BARBUS_SEND_PERI:
+                            case CRSF_FRAMETYPE_BARBUS_SEND_PERI://luengoa
                                 {
                                     Serial.printf("Received FRAME %X received \n", rxFrame.frame.type);
                                     
@@ -284,7 +220,7 @@ namespace serialReceiverLayer
 
                                 break;
                             default:
-                                Serial.printf("Received FRAME %X received\n", rxFrame.frame.type);
+                                Serial.printf("Received FRAME %X received\n", rxFrame.frame.type);//luengoa
                         }
                     }
 

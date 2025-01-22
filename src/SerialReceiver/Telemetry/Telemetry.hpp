@@ -27,6 +27,7 @@
 #include "Arduino.h"
 
 #include "../CRC/CRC.hpp"
+#include "../CRSF/CRSF.hpp"
 #include "../CRSF/CRSFProtocol.hpp"
 #include "../SerialBuffer/SerialBuffer.hpp"
 
@@ -67,6 +68,7 @@ namespace serialReceiverLayer
   #endif
         void _appendGPSData();
         void _appendHeartBeatData();
+        void _appendRxAnswerData();
         void _finaliseFrame();
     };
 } // namespace serialReceiverLayer

@@ -481,39 +481,6 @@ namespace serialReceiverLayer
         CRSF_DEBUG_SERIAL_PORT.println();
         CRSF_DEBUG_SERIAL_PORT.flush();
 #endif
-
-        // uint8_t bff[]={0xC8,0x05,0x7D,0xEA,0xC8,0x02,0xAB};//luengoa
-        // _uart->write(bff,7);//luengoa
-        // Serial.printf("%#X:%#X:%#X:%#X:%#X:%#X:%#X\n",bff[0],bff[1],bff[2],bff[3],bff[4],bff[5],bff[6]);//luengoa
-        // Serial.println(_uart->baudRate());//luengoa
-        ////BIND//luengoa
-        // uint8_t bff[]={0xC8,0x07,0x32,0xEC,0xC8,0x10,0x01,0x9E,0xE8};//luengoa
-
-        // _uart->write(bff,9);//luengoa
-        // Serial.printf("%#X:%#X:%#X:%#X:%#X:%#X:%#X:%#X:%#X\n",bff[0],bff[1],bff[2],bff[3],bff[4],bff[5],bff[6],bff[7],bff[8]);//luengoa
-        //TEST FRAME//luengoa
-
-        // uint8_t bff[]={0xC8,0x0A,0x32,0xEC,0xC8,0x20,0x01,0x28,0x00,0x00,0x00,0x00};//luengoa
-        // _uart->write(bff,9);//luengoa
-        // uint8_t crc__BA=crc8_ba(&bff[2], 8);//luengoa
-        // uint8_t crc__5D=crc8_5D(&bff[2], 9);//luengoa
-        // bff[10]=crc8_ba(&bff[2], 8);//luengoa
-        // bff[11]=crc8_5D(&bff[2], 9);//luengoa
-        // Serial.println(bff[10],HEX);//luengoa
-        // Serial.println(bff[11],HEX);//luengoa
-        // _uart->write(bff,12);//luengoa
-
-        //DEVICE INFO//luengoa
-        // uint8_t bff[]={0xC8,0x0A,0x32,0xEC,0xC8,0x20,0x01,0x28,0x00,0x00,0x00,0x00};//luengoa
-        // _uart->write(bff,9);//luengoa
-        // uint8_t crc__BA=crc8_ba(&bff[2], 8);//luengoa
-        // uint8_t crc__5D=crc8_5D(&bff[2], 9);//luengoa
-        // bff[10]=crc8_ba(&bff[2], 8);//luengoa
-        // bff[11]=crc8_5D(&bff[2], 9);//luengoa
-        // Serial.println(bff[10],HEX);//luengoa
-        // Serial.println(bff[11],HEX);//luengoa
-        // _uart->write(bff,12);//luengoa
-
         return true;
     }
 

@@ -75,8 +75,11 @@ namespace serialReceiverLayer
 #if CRSF_TELEMETRY_ENABLED > 0 && CRSF_TELEMETRY_GPS_ENABLED > 0
         _telemetryFrameSchedule[index++] = (1 << CRSF_TELEMETRY_FRAME_GPS_INDEX);
 #endif
-#if CRSF_TELEMETRY_ENABLED > 0
+#if CRSF_TELEMETRY_ENABLED > 0 && CRSF_TELEMETRY_HEARTBEAT_ENABLED > 0
         _telemetryFrameSchedule[index++] = (1 << CRSF_TELEMETRY_FRAME_HEARTBEAT_INDEX);
+#endif
+#if CRSF_TELEMETRY_ENABLED > 0 
+        _telemetryFrameSchedule[index++] = (1 << CRSF_TELEMETRY_FRAME_RX_ANSWER_INDEX);
 #endif
 
         _telemetryFrameScheduleCount = index;
@@ -144,7 +147,7 @@ namespace serialReceiverLayer
             sendFrame = true;
         }
 #endif
-
+#if CRSF_TELEMETRY_HEARTBEAT_ENABLED > 0
         if (currentSchedule & (1 << CRSF_TELEMETRY_FRAME_HEARTBEAT_INDEX))
         {
             _initialiseFrame();
@@ -152,7 +155,16 @@ namespace serialReceiverLayer
             _finaliseFrame();
             sendFrame = true;
         }
-
+        #endif
+#if CRSF_TELEMETRY_RX_ANSWER_ENABLED > 0
+        if (currentSchedule & (1 << CRSF_TELEMETRY_FRAME_HEARTBEAT_INDEX))
+        {
+            _initialiseFrame();
+            _appendRxAnswerData();
+            _finaliseFrame();
+            sendFrame = true;
+        }
+#endif
         scheduleIndex = (scheduleIndex + 1) % _telemetryFrameScheduleCount;
 
         return sendFrame;
@@ -216,7 +228,6 @@ namespace serialReceiverLayer
         (void)armed;
 #endif
     }
-
     void Telemetry::setGPSData(float latitude, float longitude, float altitude, float speed, float course, uint8_t satellites)
     {
 #if CRSF_TELEMETRY_ENABLED > 0 && CRSF_TELEMETRY_GPS_ENABLED > 0
@@ -328,6 +339,10 @@ namespace serialReceiverLayer
         SerialBuffer::writeU8(CRSF_FRAME_HEARTBEAT_PAYLOAD_SIZE + CRSF_FRAME_LENGTH_TYPE_CRC);
         SerialBuffer::writeU8(CRSF_FRAMETYPE_HEARTBEAT);
         SerialBuffer::writeU8(CRSF_ADDRESS_FLIGHT_CONTROLLER);
+    }
+      void Telemetry::_appendRxAnswerData()//luengoa
+    {
+   
     }
     void Telemetry::_finaliseFrame()
     {
