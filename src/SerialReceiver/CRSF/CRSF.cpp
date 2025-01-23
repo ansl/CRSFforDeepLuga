@@ -64,7 +64,6 @@ namespace serialReceiverLayer
 
             memcpy(rxFrame.raw, crsf.rxFrame.raw, CRSF_FRAME_SIZE_MAX);
             memcpy(rcChannelsFrame.raw, crsf.rcChannelsFrame.raw, CRSF_FRAME_SIZE_MAX);
-            memcpy(txFrame.raw, crsf.txFrame.raw, CRSF_FRAME_SIZE_MAX);
             *crc8 = *crsf.crc8;
         }
 
@@ -148,6 +147,9 @@ namespace serialReceiverLayer
                 if (framePosition >= fullFrameLength)
                 {
                     /* Frame is complete, calculate the CRC and check if it is valid. */
+                    rcFrameReceived = false;
+                    pingFrameReceived=false;
+                    barbusPerimeterFrameReceived=false;
                     const uint8_t crc = calculateFrameCRC();
                     if (rxFrame.frame.type != CRSF_FRAMETYPE_RC_CHANNELS_PACKED && rxFrame.frame.type != CRSF_FRAMETYPE_LINK_STATISTICS)
                     {
@@ -189,31 +191,14 @@ namespace serialReceiverLayer
 #endif
                             case CRSF_FRAMETYPE_DEVICE_PING: //luengoa
                                 {
-                                    Serial.printf("Received FRAME %X received \n", rxFrame.frame.type);
-                                    rx_answer = 1;
-                                    uint8_t bff[29] = {0xC8, 0x00, 0x29, 0xEA, 0xC8, 0x44, 0x65, 0x65, 0x70, 0x4C, 0x75, 0x67, 0x61, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00}; //luengoa
-                                    // bff[10] = crc8_ba(&bff[2], 8);   
-                                    bff[1]=sizeof(bff)-2;                                                         //luengoa
-                                    bff[sizeof(bff) - 1] = crc8_5D(&bff[2], sizeof(bff) - 3); //luengoa
-                                    memcpy(txFrame.raw, bff, sizeof(bff));
+                                    pingFrameReceived=true;
+
                                 }
                                 break;
                             case CRSF_FRAMETYPE_BARBUS_SEND_PERI://luengoa
                                 {
-                                    Serial.printf("Received FRAME %X received \n", rxFrame.frame.type);
+                                    barbusPerimeterFrameReceived=true;
                                     
-                                    double coord[5][2];
-                                    memset (coord,0,10*sizeof(double)); 
-                                    memcpy(coord,&rxFrame.raw[7],10*sizeof(double));
-                                    // coord=*reinterpret_cast<const double*>(&rxFrame.raw[5])
-                                    rx_answer = 1;
-                                    uint8_t bff[29] = {0xC8, 0x00, CRSF_FRAMETYPE_BARBUS_ACK, CRSF_ADDRESS_RADIO_TRANSMITTER,CRSF_ADDRESS_FLIGHT_CONTROLLER,CRSF_FRAMETYPE_BARBUS_SEND_PERI, rxFrame.raw[6], 0x00}; //luengoa -- [sync] [len] [type] [DEST] [ORIG] [COMMAND to ACK] [CHUNK_N][payload] [crc8]
-                                    bff[1]=sizeof(bff)-2; //luengoa
-                                    bff[sizeof(bff) - 1] = crc8_5D(&bff[2], sizeof(bff) - 3); //luengoa
-                                    memcpy(txFrame.raw, bff, sizeof(bff));
-
-                                    Serial.printf("Received coords  lat=%1.7f  lon=%1.7f  lat=%1.7f  lon=%1.7f  \n", coord[0][0],coord[0][1], coord[1][0],coord[1][1]);
-
 
                                 }
                                 //luengoa

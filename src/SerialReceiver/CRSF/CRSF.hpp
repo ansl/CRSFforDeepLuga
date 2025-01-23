@@ -66,13 +66,12 @@ namespace serialReceiverLayer
         void getRcChannels(uint16_t *rcChannels);
         void getLinkStatistics(link_statistics_t *linkStats);
 
-        uint32_t bdrate;//luengoa
-        bool rx_answer=0;//luengoa
-        bool BR_change=0;//luengoa
-        crsfProtocol::frame_t txFrame;//luengoa
-        double coord_buffer[20]; //luengoa passthrough
-      private:
+
         bool rcFrameReceived;
+        bool pingFrameReceived; //luengoa
+        bool barbusPerimeterFrameReceived; //luengoa
+      private:
+
         uint16_t frameCount;
         uint32_t timePerFrame;
         crsfProtocol::frame_t rxFrame;

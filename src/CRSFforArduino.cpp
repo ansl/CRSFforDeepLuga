@@ -173,6 +173,24 @@ namespace sketchLayer
         (void)callback;
 #endif
     }
+    void CRSFforArduino::setPingCallback(void (*callback)(void))
+    {
+#if CRSF_RC_ENABLED > 0
+        this->SerialReceiver::setPingCallback(callback);
+#else
+        // Prevent compiler warnings
+        (void)callback;
+#endif
+    }
+    void CRSFforArduino::setBarbusPerimeterCallback(void (*callback)(void))
+    {
+#if CRSF_RC_ENABLED > 0
+        this->SerialReceiver::setBarbusPerimeterCallback(callback);
+#else
+        // Prevent compiler warnings
+        (void)callback;
+#endif
+    }
 
     void CRSFforArduino::setLinkStatisticsCallback(void (*callback)(serialReceiverLayer::link_statistics_t linkStatistics))
     {
@@ -363,4 +381,8 @@ namespace sketchLayer
         (void)satellites;
 #endif
     }
+    
+    void CRSFforArduino::telemetryWriteFrame(uint8_t FRAME, uint8_t * PAYLOAD,uint8_t len){//luengoa
+        return this->SerialReceiver::telemetryWriteFrame(FRAME, PAYLOAD,len);
+        }
 } // namespace sketchLayer

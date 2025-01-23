@@ -282,6 +282,23 @@ namespace genericStreamBuffer
         return length;
     }
 
+
+    size_t SerialBuffer::writeU8Array(const uint8_t *array,uint8_t length)
+    {
+        
+
+        if (bufferIndex + length > bufferSizeMax)
+        {
+            return 0;
+        }
+
+        memcpy(buffer + bufferIndex, array, length);
+        bufferIndex += length;
+        bufferLength = bufferIndex;
+
+        return length;
+    }
+
     size_t SerialBuffer::getLength()
     {
         return bufferLength;

@@ -535,21 +535,11 @@ namespace serialReceiverLayer
 
 #if CRSF_TELEMETRY_ENABLED > 0
 
-                // ANSWER TO RX request //luengoa
-                if (crsf->rx_answer == 1)
-                {                                                               //luengoa
-                    Serial.println("SENDING......");                            //luengoa
-                    _uart->write(crsf->txFrame.raw, sizeof(crsf->txFrame.raw)); //luengoa
-                    Serial.println("ANSWER SENT");                              //luengoa
-                    crsf->rx_answer = 0;
-                }
-                else
-                {
+
                     if (telemetry->update())
                     {
                         telemetry->sendTelemetryData(_uart);
                     }
-                } //luengoa
 
 #endif
 
@@ -559,6 +549,16 @@ namespace serialReceiverLayer
                 if (_rcChannelsCallback != nullptr)
                 {
                     _rcChannelsCallback(_rcChannels);
+                }
+
+                if (_pingCallback != nullptr && crsf->pingFrameReceived)
+                {
+                    _pingCallback();
+                }
+
+                if (_BarbusPerimeterCallback != nullptr && crsf->barbusPerimeterFrameReceived)
+                {
+                    _BarbusPerimeterCallback('' rxFrame);
                 }
 #endif
             }
@@ -588,6 +588,14 @@ namespace serialReceiverLayer
     void SerialReceiver::setRcChannelsCallback(rcChannelsCallback_t callback)
     {
         _rcChannelsCallback = callback;
+    }
+    void SerialReceiver::setPingCallback(pingCallback_t callback)
+    {
+        _pingCallback = callback;
+    }
+    void SerialReceiver::setBarbusPerimeterCallback(BarbusPerimeterCallback_t callback)
+    {
+        _BarbusPerimeterCallback = callback;
     }
 
     uint16_t SerialReceiver::readRcChannel(uint8_t channel, bool raw)
@@ -784,5 +792,13 @@ namespace serialReceiverLayer
         telemetry->setGPSData(latitude, longitude, altitude, speed, groundCourse, satellites);
     }
 #endif
+
+#if CRSF_TELEMETRY_TRANSMIT_FRAME_ENABLED > 0
+    void SerialReceiver::telemetryWriteFrame(uint8_t FRAME, uint8_t * PAYLOAD,uint8_t len)
+    {
+        telemetry->setFrameData(FRAME,PAYLOAD,len); //luengoa
+    }
+#endif
+
 #endif
 } // namespace serialReceiverLayer

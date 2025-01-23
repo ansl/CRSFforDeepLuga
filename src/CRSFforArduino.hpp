@@ -47,6 +47,8 @@ namespace sketchLayer
         uint16_t readRcChannel(uint8_t channel, bool raw = false);
         void setRcChannelsCallback(void (*callback)(serialReceiverLayer::rcChannels_t *rcChannels));
 
+        void setPingCallback(void (*callback)(void));
+        void setBarbusPerimeterCallback(void (*callback)(void));
         // Link statistics functions.
         void setLinkStatisticsCallback(void (*callback)(serialReceiverLayer::link_statistics_t linkStatistics));
 
@@ -63,7 +65,7 @@ namespace sketchLayer
         void telemetryWriteCustomFlightMode(const char *flightMode, bool armed = false);
         void telemetryWriteGPS(float latitude, float longitude, float altitude, float speed, float groundCourse, uint8_t satellites);
 
-        void telemetryTransmit();//luengoa
+        void telemetryWriteFrame(uint8_t FRAME, uint8_t * PAYLOAD,uint8_t len);//luengoa
 
       private:
     };

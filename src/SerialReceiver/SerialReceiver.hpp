@@ -69,6 +69,8 @@ namespace serialReceiverLayer
     typedef void (*rcChannelsCallback_t)(rcChannels_t *);
     typedef void (*flightModeCallback_t)(flightModeId_t);
     typedef void (*linkStatisticsCallback_t)(link_statistics_t);
+    typedef void (*pingCallback_t)(void);
+    typedef void (*BarbusPerimeterCallback_t)(frame_t);
 
     class SerialReceiver
     {
@@ -98,6 +100,8 @@ namespace serialReceiverLayer
         uint16_t usToRc(uint16_t us);
         uint16_t readRcChannel(uint8_t channel, bool raw = false);
 
+        void setPingCallback(pingCallback_t callback);
+        void setBarbusPerimeterCallback(BarbusPerimeterCallback_t callback);
 #if CRSF_FLIGHTMODES_ENABLED > 0
         bool setFlightMode(flightModeId_t flightModeId, const char *flightModeName, uint8_t channel, uint16_t min, uint16_t max);
         bool setFlightMode(flightModeId_t flightMode, uint8_t channel, uint16_t min, uint16_t max);
@@ -113,6 +117,7 @@ namespace serialReceiverLayer
         void telemetryWriteFlightMode(flightModeId_t flightMode, bool disarmed = false);
         void telemetryWriteCustomFlightMode(const char *flightMode, bool armed = true);
         void telemetryWriteGPS(float latitude, float longitude, float altitude, float speed, float groundCourse, uint8_t satellites);
+        void telemetryWriteFrame(uint8_t FRAME, uint8_t * PAYLOAD, uint8_t len);
 #endif
 
       private:
@@ -129,6 +134,10 @@ namespace serialReceiverLayer
 #if CRSF_RC_ENABLED > 0
         rcChannels_t *_rcChannels = nullptr;
         rcChannelsCallback_t _rcChannelsCallback = nullptr;
+        pingCallback_t _pingCallback = nullptr;
+        BarbusPerimeterCallback_t _BarbusPerimeterCallback = nullptr;
+
+
 #endif
 
 #if CRSF_TELEMETRY_ENABLED > 0

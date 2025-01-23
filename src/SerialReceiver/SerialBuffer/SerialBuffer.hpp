@@ -58,6 +58,8 @@ namespace genericStreamBuffer
 
         size_t writeString(const char *string);
 
+        size_t writeU8Array(const uint8_t *array,uint8_t length);
+
         size_t getLength();
 
         size_t getMaxSize();

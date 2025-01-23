@@ -75,15 +75,16 @@ namespace serialReceiverLayer
 #if CRSF_TELEMETRY_ENABLED > 0 && CRSF_TELEMETRY_GPS_ENABLED > 0
         _telemetryFrameSchedule[index++] = (1 << CRSF_TELEMETRY_FRAME_GPS_INDEX);
 #endif
+
+#if CRSF_TELEMETRY_ENABLED > 0
+        _telemetryFrameSchedule[index++] = (1 << CRSF_TELEMETRY_FRAME_TRANSMIT_FRAME_INDEX);
+#endif
 #if CRSF_TELEMETRY_ENABLED > 0 && CRSF_TELEMETRY_HEARTBEAT_ENABLED > 0
         _telemetryFrameSchedule[index++] = (1 << CRSF_TELEMETRY_FRAME_HEARTBEAT_INDEX);
 #endif
-#if CRSF_TELEMETRY_ENABLED > 0 
-        _telemetryFrameSchedule[index++] = (1 << CRSF_TELEMETRY_FRAME_RX_ANSWER_INDEX);
-#endif
-
         _telemetryFrameScheduleCount = index;
     }
+
 
     void Telemetry::end()
     {
@@ -155,12 +156,12 @@ namespace serialReceiverLayer
             _finaliseFrame();
             sendFrame = true;
         }
-        #endif
-#if CRSF_TELEMETRY_RX_ANSWER_ENABLED > 0
-        if (currentSchedule & (1 << CRSF_TELEMETRY_FRAME_HEARTBEAT_INDEX))
+#endif
+#if CRSF_TELEMETRY_TRANSMIT_FRAME_ENABLED > 0
+        if (currentSchedule & (1 << CRSF_TELEMETRY_FRAME_TRANSMIT_FRAME_INDEX))
         {
             _initialiseFrame();
-            _appendRxAnswerData();
+            _appendFrameData();
             _finaliseFrame();
             sendFrame = true;
         }
@@ -246,13 +247,21 @@ namespace serialReceiverLayer
         (void)satellites;
 #endif
     }
+    void Telemetry::setFrameData(uint8_t FRAME, uint8_t *PAYLOAD, uint8_t len)
+    {
+
+        _frameData.frame.deviceAddress = 0xC8;
+        _frameData.frame.frameLength = len; // payload len + frame type  + CRC
+        _frameData.frame.type = FRAME;
+        memcpy(&_frameData.raw[3], PAYLOAD, len); // payload include destiantion and origing address
+    }
 
     void Telemetry::sendTelemetryData(HardwareSerial *db)
     {
         uint8_t *buffer = SerialBuffer::getBuffer();
         size_t length = SerialBuffer::getLength();
-
         db->write(buffer, length);
+
     }
 
     int16_t Telemetry::_decidegreeToRadians(int16_t decidegrees)
@@ -340,16 +349,19 @@ namespace serialReceiverLayer
         SerialBuffer::writeU8(CRSF_FRAMETYPE_HEARTBEAT);
         SerialBuffer::writeU8(CRSF_ADDRESS_FLIGHT_CONTROLLER);
     }
-      void Telemetry::_appendRxAnswerData()//luengoa
+    void Telemetry::_appendFrameData()
     {
-   
+        SerialBuffer::writeU8(_frameData.frame.frameLength+2);
+        SerialBuffer::writeU8(_frameData.frame.type);
+        SerialBuffer::writeU8Array(_frameData.frame.payload, _frameData.frame.frameLength);
     }
+
     void Telemetry::_finaliseFrame()
     {
         uint8_t *buffer = SerialBuffer::getBuffer();
-        uint8_t length = SerialBuffer::getLength();
+        uint8_t length = SerialBuffer::getLength();    
         uint8_t crc = GenericCRC::calculate(2, buffer[2], buffer, length);
-
         SerialBuffer::writeU8(crc);
+
     }
 } // namespace serialReceiverLayer

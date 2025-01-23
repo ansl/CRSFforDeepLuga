@@ -50,12 +50,15 @@ namespace serialReceiverLayer
         void setFlightModeData(const char *flightMode, bool armed = false);
         void setGPSData(float latitude, float longitude, float altitude, float speed, float course, uint8_t satellites);
 
+        void setFrameData(uint8_t FRAME, uint8_t *PAYLOAD, uint8_t len);
+
         void sendTelemetryData(HardwareSerial *db);
 
       private:
         uint8_t _telemetryFrameScheduleCount;
         uint8_t _telemetryFrameSchedule[crsfProtocol::CRSF_TELEMETRY_FRAME_SCHEDULE_MAX];
         crsfProtocol::telemetryData_t _telemetryData;
+        crsfProtocol::frame_t _frameData;
 
         int16_t _decidegreeToRadians(int16_t decidegrees);
 
@@ -68,7 +71,7 @@ namespace serialReceiverLayer
   #endif
         void _appendGPSData();
         void _appendHeartBeatData();
-        void _appendRxAnswerData();
+        void _appendFrameData();
         void _finaliseFrame();
     };
 } // namespace serialReceiverLayer
