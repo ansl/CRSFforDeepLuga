@@ -63,7 +63,10 @@ namespace sketchLayer
         void telemetryWriteCustomFlightMode(const char *flightMode, bool armed = false);
         void telemetryWriteGPS(float latitude, float longitude, float altitude, float speed, float groundCourse, uint8_t satellites);
 
+        // Custom Frame functions.
         void telemetryWriteCustomFrame(uint8_t frameType, uint8_t *bff, uint8_t length);
+        void setCustomFrameCallback(void (*callback)(crsfProtocol::frame_t *rcChannels));
+
       private:
     };
 } // namespace sketchLayer

@@ -578,6 +578,11 @@ namespace serialReceiverLayer
     {
         _rcChannelsCallback = callback;
     }
+        void SerialReceiver::setCustomFrameCallback(customFrameCallback_t callback)
+    {
+        _customFrameCallback = callback;
+    }
+
 
     uint16_t SerialReceiver::readRcChannel(uint8_t channel, bool raw)
     {

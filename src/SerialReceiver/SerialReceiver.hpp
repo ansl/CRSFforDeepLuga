@@ -69,6 +69,7 @@ namespace serialReceiverLayer
     typedef void (*rcChannelsCallback_t)(rcChannels_t *);
     typedef void (*flightModeCallback_t)(flightModeId_t);
     typedef void (*linkStatisticsCallback_t)(link_statistics_t);
+    typedef void (*customFrameCallback_t)(crsfProtocol::frame_t *);
 
     class SerialReceiver
     {
@@ -113,7 +114,10 @@ namespace serialReceiverLayer
         void telemetryWriteFlightMode(flightModeId_t flightMode, bool disarmed = false);
         void telemetryWriteCustomFlightMode(const char *flightMode, bool armed = true);
         void telemetryWriteGPS(float latitude, float longitude, float altitude, float speed, float groundCourse, uint8_t satellites);
+#if CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0
+        void setCustomFrameCallback(customFrameCallback_t callback);
         void telemetryWriteCustomFrame(uint8_t frameType, uint8_t *bff, uint8_t length);
+#endif
 #endif
 
       private:
@@ -131,6 +135,11 @@ namespace serialReceiverLayer
         rcChannels_t *_rcChannels = nullptr;
         rcChannelsCallback_t _rcChannelsCallback = nullptr;
 #endif
+
+#if CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0
+        customFrameCallback_t _customFrameCallback = nullptr;
+#endif
+
 
 #if CRSF_TELEMETRY_ENABLED > 0
         const char *flightModeStr = "ACRO";

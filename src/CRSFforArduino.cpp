@@ -173,6 +173,15 @@ namespace sketchLayer
         (void)callback;
 #endif
     }
+        void CRSFforArduino::setCustomFrameCallback(void (*callback)(crsfProtocol::frame_t *rxFrame))
+    {
+#if CRSF_RC_ENABLED > 0
+        this->SerialReceiver::setCustomFrameCallback(callback);
+#else
+        // Prevent compiler warnings
+        (void)callback;
+#endif
+    }
 
     void CRSFforArduino::setLinkStatisticsCallback(void (*callback)(serialReceiverLayer::link_statistics_t linkStatistics))
     {
