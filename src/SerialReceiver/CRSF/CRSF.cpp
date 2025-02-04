@@ -189,13 +189,7 @@ namespace serialReceiverLayer
 #endif
                             case CRSF_FRAMETYPE_DEVICE_PING: //luengoa
                                 {
-                                    Serial.printf("Received FRAME %X received \n", rxFrame.frame.type);
-                                    rx_answer = 1;
-                                    uint8_t bff[29] = {0xC8, 0x00, 0x29, 0xEA, 0xC8, 0x44, 0x65, 0x65, 0x70, 0x4C, 0x75, 0x67, 0x61, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00}; //luengoa
-                                    // bff[10] = crc8_ba(&bff[2], 8);   
-                                    bff[1]=sizeof(bff)-2;                                                         //luengoa
-                                    bff[sizeof(bff) - 1] = crc8_5D(&bff[2], sizeof(bff) - 3); //luengoa
-                                    memcpy(txFrame.raw, bff, sizeof(bff));
+
                                 }
                                 break;
                             case CRSF_FRAMETYPE_BARBUS_SEND_PERI://luengoa

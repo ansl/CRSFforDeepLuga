@@ -272,6 +272,7 @@ namespace crsfProtocol
         flightModeData_t flightMode;
         gpsData_t gps;
         customFrame_t customFrame;
+        bool send_flag;
     } telemetryData_t;
 
     enum baudRate_e

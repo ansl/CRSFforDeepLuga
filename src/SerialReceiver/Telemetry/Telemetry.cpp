@@ -162,7 +162,12 @@ namespace serialReceiverLayer
             _initialiseFrame();
             _appendCustomFrameData();
             _finaliseFrame();
-            sendFrame = true;
+            if(_telemetryData.send_flag){
+                sendFrame = true;
+            }
+            else{
+                sendFrame = false;}
+            
         }
 #endif
         scheduleIndex = (scheduleIndex + 1) % _telemetryFrameScheduleCount;
@@ -253,6 +258,7 @@ namespace serialReceiverLayer
     #if CRSF_TELEMETRY_ENABLED > 0 && CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0
         memcpy(_telemetryData.customFrame.FRAME.raw, bff, length);
         _telemetryData.customFrame.length = length;
+        _telemetryData.send_flag=true;
 
     #endif
         }
@@ -263,6 +269,7 @@ namespace serialReceiverLayer
         size_t length = SerialBuffer::getLength();
 
         db->write(buffer, length);
+        _telemetryData.send_flag=false;
     }
 
     int16_t Telemetry::_decidegreeToRadians(int16_t decidegrees)
