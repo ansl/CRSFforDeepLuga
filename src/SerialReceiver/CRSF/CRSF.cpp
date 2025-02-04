@@ -23,7 +23,6 @@
  */
 
 #include "CRSF.hpp"
-#include "../CRC/CRC_test.hpp"
 #include "Arduino.h"
 #include <cstdlib>
 //luengoa
@@ -131,23 +130,8 @@ namespace serialReceiverLayer
         {
             const int fullFrameLength = framePosition < 3 ? 5 : min(rxFrame.frame.frameLength + CRSF_FRAME_LENGTH_ADDRESS + CRSF_FRAME_LENGTH_FRAMELENGTH, (int)CRSF_FRAME_SIZE_MAX);
 
-            // Serial.printf("%2X ; %d; %d ; %d ;%d\n", rxByte, framePosition, fullFrameLength, currentTime - frameStartTime, timePerFrame);
-            // if (rxByte == 0xc8)
-            // {
-            //     Serial.println("xxxxxxxxxxxxxxxxxxxxxxx");
-            // }
-            // if (rxByte == 0x28)
-            // {
-            //     Serial.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-            // }
-            /* Assume the full frame length is 5 bytes until the frame length byte is received. */
-
             if (framePosition < fullFrameLength)
             {
-                /* Store the received byte in the frame buffer. */
-                // if(rxByte==0x78){
-                //             Serial.printf("%X\n",rxByte);
-                // }
                 rxFrame.raw[framePosition] = rxByte;
                 framePosition++;
 
