@@ -265,14 +265,19 @@ namespace serialReceiverLayer
 #endif
     }
 
-    void CRSF::getCustomFrame(crsfProtocol::frame_t *custom_frame)
+    bool CRSF::getCustomFrame(crsfProtocol::frame_t *custom_frame)
     {
 #if CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0
         if (customFrameReceived)
         {
             memcpy(custom_frame, &customFrameFrame, sizeof(crsfProtocol::frame_t));
             customFrameReceived = false;
+            memset(customFrameFrame.raw, 0, CRSF_FRAME_SIZE_MAX);
+            return true;
         }
+        else{
+
+        } return false;
 
 #else
         (void)custom_frame;

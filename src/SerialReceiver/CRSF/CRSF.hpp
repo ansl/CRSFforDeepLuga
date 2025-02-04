@@ -64,7 +64,7 @@ namespace serialReceiverLayer
         bool receiveFrames(uint8_t rxByte);
         void getFailSafe(bool *failSafe);
         void getRcChannels(uint16_t *rcChannels);
-        void getCustomFrame(crsfProtocol::frame_t *custom_frame);
+        bool getCustomFrame(crsfProtocol::frame_t *custom_frame);
         void getLinkStatistics(link_statistics_t *linkStats);
 
       private:

@@ -533,7 +533,7 @@ namespace serialReceiverLayer
 #endif
     }
 
-#if CRSF_RC_ENABLED > 0 || CRSF_TELEMETRY_ENABLED > 0 || CRSF_LINK_STATISTICS_ENABLED > 0
+#if CRSF_RC_ENABLED > 0 || CRSF_TELEMETRY_ENABLED > 0 || CRSF_LINK_STATISTICS_ENABLED > 0|| CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0
     void SerialReceiver::processFrames()
     {
         while (_uart->available() > 0)
@@ -568,9 +568,8 @@ namespace serialReceiverLayer
                 }
 #endif
 
-#if CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0
-                crsf->getCustomFrame(_customFrame);    
-                if (_customFrameCallback != nullptr)
+#if CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0   
+                if (_customFrameCallback != nullptr && crsf->getCustomFrame(_customFrame))
                 {
                     _customFrameCallback(_customFrame);
                 }
