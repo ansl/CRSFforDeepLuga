@@ -164,6 +164,7 @@ namespace serialReceiverLayer
             _finaliseFrame();
             if(_telemetryData.send_flag){
                 sendFrame = true;
+                _telemetryData.send_flag=false;
             }
             else{
                 sendFrame = false;}
@@ -253,10 +254,11 @@ namespace serialReceiverLayer
     }
 
 
-    void Telemetry::setCustomFrameData(uint8_t frameType, uint8_t *bff, uint8_t length)
+    void Telemetry::setCustomFrameData(uint8_t frameType, uint8_t *payload, uint8_t length)
         {
     #if CRSF_TELEMETRY_ENABLED > 0 && CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0
-        memcpy(_telemetryData.customFrame.FRAME.raw, bff, length);
+        memcpy(_telemetryData.customFrame.FRAME.frame.payload, payload, length);
+        _telemetryData.customFrame.FRAME.frame.type=frameType;
         _telemetryData.customFrame.length = length;
         _telemetryData.send_flag=true;
 
@@ -269,7 +271,6 @@ namespace serialReceiverLayer
         size_t length = SerialBuffer::getLength();
 
         db->write(buffer, length);
-        _telemetryData.send_flag=false;
     }
 
     int16_t Telemetry::_decidegreeToRadians(int16_t decidegrees)
@@ -359,7 +360,9 @@ namespace serialReceiverLayer
     }
       void Telemetry::_appendCustomFrameData()//luengoa
     {
-         SerialBuffer::writeByteArray(_telemetryData.customFrame.FRAME.raw,_telemetryData.customFrame.length);
+        SerialBuffer::writeU8(_telemetryData.customFrame.length + CRSF_FRAME_LENGTH_TYPE_CRC);
+        SerialBuffer::writeU8(_telemetryData.customFrame.FRAME.frame.type);
+        SerialBuffer::writeByteArray(_telemetryData.customFrame.FRAME.frame.payload,_telemetryData.customFrame.length);
    
     }
     void Telemetry::_finaliseFrame()

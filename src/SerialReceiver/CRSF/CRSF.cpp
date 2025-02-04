@@ -36,6 +36,7 @@ namespace serialReceiverLayer
     {
 
         rcFrameReceived = false;
+        customFrameReceived = false;
         frameCount = 0;
         timePerFrame = 0;
 
@@ -45,12 +46,13 @@ namespace serialReceiverLayer
     CRSF::CRSF(const CRSF &crsf)
     {
         rcFrameReceived = crsf.rcFrameReceived;
+        customFrameReceived = crsf.customFrameReceived;
         frameCount = crsf.frameCount;
         timePerFrame = crsf.timePerFrame;
 
         memcpy(rxFrame.raw, crsf.rxFrame.raw, CRSF_FRAME_SIZE_MAX);
         memcpy(rcChannelsFrame.raw, crsf.rcChannelsFrame.raw, CRSF_FRAME_SIZE_MAX);
-
+        memcpy(customFrameFrame.raw, crsf.customFrameFrame.raw, CRSF_FRAME_SIZE_MAX);
         crc8 = new GenericCRC(*crsf.crc8);
     }
 
@@ -59,12 +61,13 @@ namespace serialReceiverLayer
         if (this != &crsf)
         {
             rcFrameReceived = crsf.rcFrameReceived;
+            customFrameReceived = crsf.customFrameReceived;
             frameCount = crsf.frameCount;
             timePerFrame = crsf.timePerFrame;
 
             memcpy(rxFrame.raw, crsf.rxFrame.raw, CRSF_FRAME_SIZE_MAX);
             memcpy(rcChannelsFrame.raw, crsf.rcChannelsFrame.raw, CRSF_FRAME_SIZE_MAX);
-            memcpy(txFrame.raw, crsf.txFrame.raw, CRSF_FRAME_SIZE_MAX);
+            memcpy(customFrameFrame.raw, crsf.customFrameFrame.raw, CRSF_FRAME_SIZE_MAX);
             *crc8 = *crsf.crc8;
         }
 
@@ -80,11 +83,13 @@ namespace serialReceiverLayer
     void CRSF::begin()
     {
         rcFrameReceived = false;
+        customFrameReceived = false;
         frameCount = 0;
         timePerFrame = 0;
 
         memset(rxFrame.raw, 0, CRSF_FRAME_SIZE_MAX);
         memset(rcChannelsFrame.raw, 0, CRSF_FRAME_SIZE_MAX);
+        memset(customFrameFrame.raw, 0, CRSF_FRAME_SIZE_MAX);
     }
 
     void CRSF::end()
@@ -95,6 +100,7 @@ namespace serialReceiverLayer
         timePerFrame = 0;
         frameCount = 0;
         rcFrameReceived = false;
+        customFrameReceived = false;
     }
 
     void CRSF::setFrameTime(uint32_t baudRate, uint8_t packetCount)
@@ -187,34 +193,11 @@ namespace serialReceiverLayer
                                 // Serial.printf("Received: CRSF_FRAMETYPE_LINK_STATISTICS \n");
                                 break;
 #endif
-                            case CRSF_FRAMETYPE_DEVICE_PING: //luengoa
-                                {
 
-                                }
-                                break;
-                            case CRSF_FRAMETYPE_BARBUS_SEND_AREA://luengoa
-                                {
-                                    Serial.printf("Received FRAME %X received \n", rxFrame.frame.type);
-                                    
-                                    double coord[5][2];
-                                    memset (coord,0,10*sizeof(double)); 
-                                    memcpy(coord,&rxFrame.raw[7],10*sizeof(double));
-                                    // coord=*reinterpret_cast<const double*>(&rxFrame.raw[5])
-                                    rx_answer = 1;
-                                    uint8_t bff[29] = {0xC8, 0x00, CRSF_FRAMETYPE_BARBUS_ACK, CRSF_ADDRESS_RADIO_TRANSMITTER,CRSF_ADDRESS_FLIGHT_CONTROLLER,CRSF_FRAMETYPE_BARBUS_SEND_AREA, rxFrame.raw[6], 0x00}; //luengoa -- [sync] [len] [type] [DEST] [ORIG] [COMMAND to ACK] [CHUNK_N][payload] [crc8]
-                                    bff[1]=sizeof(bff)-2; //luengoa
-                                    bff[sizeof(bff) - 1] = crc8_5D(&bff[2], sizeof(bff) - 3); //luengoa
-                                    memcpy(txFrame.raw, bff, sizeof(bff));
-
-                                    Serial.printf("Received coords  lat=%1.7f  lon=%1.7f  lat=%1.7f  lon=%1.7f  \n", coord[0][0],coord[0][1], coord[1][0],coord[1][1]);
-
-
-                                }
-                                //luengoa
-
-                                break;
                             default:
-                                Serial.printf("Received FRAME %X received\n", rxFrame.frame.type);//luengoa
+                                memcpy(&customFrameFrame, &rxFrame, CRSF_FRAME_SIZE_MAX);
+                                Serial.printf("RRReceived FRAME %X received\n", rxFrame.frame.type); //luengoa
+                                customFrameReceived = true;
                         }
                     }
 
@@ -279,6 +262,20 @@ namespace serialReceiverLayer
         memcpy(linkStats, &linkStatistics, sizeof(link_statistics_t));
 #else
         (void)linkStats;
+#endif
+    }
+
+    void CRSF::getCustomFrame(crsfProtocol::frame_t *custom_frame)
+    {
+#if CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0
+        if (customFrameReceived)
+        {
+            memcpy(custom_frame, &customFrameFrame, sizeof(crsfProtocol::frame_t));
+            customFrameReceived = false;
+        }
+
+#else
+        (void)custom_frame;
 #endif
     }
 

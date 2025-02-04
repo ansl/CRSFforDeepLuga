@@ -137,6 +137,7 @@ namespace serialReceiverLayer
 #endif
 
 #if CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0
+        crsfProtocol::frame_t *_customFrame=nullptr;
         customFrameCallback_t _customFrameCallback = nullptr;
 #endif
 

@@ -68,6 +68,9 @@ namespace serialReceiverLayer
 #if CRSF_FLIGHTMODES_ENABLED > 0
         _flightModes = new flightMode_t[FLIGHT_MODE_COUNT];
 #endif
+#if CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0
+        _customFrame = new crsfProtocol::frame_t;
+#endif
 #endif
     }
 
@@ -97,6 +100,9 @@ namespace serialReceiverLayer
 #if CRSF_FLIGHTMODES_ENABLED > 0
         _flightModes = new flightMode_t[FLIGHT_MODE_COUNT];
 #endif
+#if CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0
+        _customFrame = new frame_t;
+#endif
 #endif
     }
 
@@ -119,6 +125,9 @@ namespace serialReceiverLayer
         memset(_rcChannels->value, 0, sizeof(_rcChannels->value));
 #if CRSF_FLIGHTMODES_ENABLED > 0
         _flightModes = new flightMode_t[FLIGHT_MODE_COUNT];
+#endif
+#if CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0
+        _customFrame = new frame_t;
 #endif
 #endif
     }
@@ -188,6 +197,10 @@ namespace serialReceiverLayer
             _linkStatistics = serialReceiver._linkStatistics;
             _linkStatisticsCallback = serialReceiver._linkStatisticsCallback;
 #endif
+#if CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0
+            _customFrame = new frame_t;
+            _customFrameCallback = serialReceiver._customFrameCallback;
+#endif
 #endif
         }
 
@@ -207,6 +220,10 @@ namespace serialReceiverLayer
 #if CRSF_FLIGHTMODES_ENABLED > 0
         delete[] _flightModes;
         _flightModes = nullptr;
+#endif
+#if CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0
+            delete _customFrame;
+            _customFrame = nullptr;
 #endif
 #endif
     }
@@ -535,10 +552,10 @@ namespace serialReceiverLayer
 
 #if CRSF_TELEMETRY_ENABLED > 0
 
-                    if (telemetry->update())
-                    {
-                        telemetry->sendTelemetryData(_uart);
-                    }
+                if (telemetry->update())
+                {
+                    telemetry->sendTelemetryData(_uart);
+                }
 
 #endif
 
@@ -548,6 +565,14 @@ namespace serialReceiverLayer
                 if (_rcChannelsCallback != nullptr)
                 {
                     _rcChannelsCallback(_rcChannels);
+                }
+#endif
+
+#if CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0
+                crsf->getCustomFrame(_customFrame);    
+                if (_customFrameCallback != nullptr)
+                {
+                    _customFrameCallback(_customFrame);
                 }
 #endif
             }
@@ -578,11 +603,10 @@ namespace serialReceiverLayer
     {
         _rcChannelsCallback = callback;
     }
-        void SerialReceiver::setCustomFrameCallback(customFrameCallback_t callback)
+    void SerialReceiver::setCustomFrameCallback(customFrameCallback_t callback)
     {
         _customFrameCallback = callback;
     }
-
 
     uint16_t SerialReceiver::readRcChannel(uint8_t channel, bool raw)
     {
@@ -779,14 +803,10 @@ namespace serialReceiverLayer
     }
 #endif
 
-void SerialReceiver::telemetryWriteCustomFrame(uint8_t frameType, uint8_t *bff, uint8_t length)
-  {
+    void SerialReceiver::telemetryWriteCustomFrame(uint8_t frameType, uint8_t *bff, uint8_t length)
+    {
         telemetry->setCustomFrameData(frameType, bff, length);
- }
-
-
-
-
+    }
 
 #endif
 } // namespace serialReceiverLayer

@@ -64,20 +64,17 @@ namespace serialReceiverLayer
         bool receiveFrames(uint8_t rxByte);
         void getFailSafe(bool *failSafe);
         void getRcChannels(uint16_t *rcChannels);
+        void getCustomFrame(crsfProtocol::frame_t *custom_frame);
         void getLinkStatistics(link_statistics_t *linkStats);
 
-        uint32_t bdrate;//luengoa
-        bool rx_answer=0;//luengoa
-        bool BR_change=0;//luengoa
-        crsfProtocol::frame_t txFrame;//luengoa
-        double coord_buffer[20]; //luengoa passthrough
       private:
         bool rcFrameReceived;
+        bool customFrameReceived;
         uint16_t frameCount;
         uint32_t timePerFrame;
         crsfProtocol::frame_t rxFrame;
-        
         crsfProtocol::frame_t rcChannelsFrame;
+        crsfProtocol::frame_t customFrameFrame;
         link_statistics_t linkStatistics;
         genericCrc::GenericCRC *crc8 = nullptr;
         uint8_t calculateFrameCRC();
