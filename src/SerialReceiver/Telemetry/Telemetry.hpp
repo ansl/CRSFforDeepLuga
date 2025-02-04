@@ -49,6 +49,7 @@ namespace serialReceiverLayer
         void setBatteryData(float voltage, float current, uint32_t capacity, uint8_t percent);
         void setFlightModeData(const char *flightMode, bool armed = false);
         void setGPSData(float latitude, float longitude, float altitude, float speed, float course, uint8_t satellites);
+        void setCustomFrameData(uint8_t frameType, uint8_t *bff, uint8_t length);
 
         void sendTelemetryData(HardwareSerial *db);
 
@@ -68,7 +69,7 @@ namespace serialReceiverLayer
   #endif
         void _appendGPSData();
         void _appendHeartBeatData();
-        void _appendRxAnswerData();
+        void _appendCustomFrameData();
         void _finaliseFrame();
     };
 } // namespace serialReceiverLayer

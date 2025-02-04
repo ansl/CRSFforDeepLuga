@@ -63,8 +63,7 @@ namespace sketchLayer
         void telemetryWriteCustomFlightMode(const char *flightMode, bool armed = false);
         void telemetryWriteGPS(float latitude, float longitude, float altitude, float speed, float groundCourse, uint8_t satellites);
 
-        void telemetryTransmit();//luengoa
-
+        void telemetryWriteCustomFrame(uint8_t frameType, uint8_t *bff, uint8_t length);
       private:
     };
 } // namespace sketchLayer

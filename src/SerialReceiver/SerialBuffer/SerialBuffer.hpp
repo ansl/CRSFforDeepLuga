@@ -57,6 +57,7 @@ namespace genericStreamBuffer
         size_t writeU32BE(uint32_t value);
 
         size_t writeString(const char *string);
+        size_t writeByteArray(const uint8_t *buff,size_t length);
 
         size_t getLength();
 

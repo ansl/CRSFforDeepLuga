@@ -535,21 +535,10 @@ namespace serialReceiverLayer
 
 #if CRSF_TELEMETRY_ENABLED > 0
 
-                // ANSWER TO RX request //luengoa
-                if (crsf->rx_answer == 1)
-                {                                                               //luengoa
-                    Serial.println("SENDING......");                            //luengoa
-                    _uart->write(crsf->txFrame.raw, sizeof(crsf->txFrame.raw)); //luengoa
-                    Serial.println("ANSWER SENT");                              //luengoa
-                    crsf->rx_answer = 0;
-                }
-                else
-                {
                     if (telemetry->update())
                     {
                         telemetry->sendTelemetryData(_uart);
                     }
-                } //luengoa
 
 #endif
 
@@ -784,5 +773,15 @@ namespace serialReceiverLayer
         telemetry->setGPSData(latitude, longitude, altitude, speed, groundCourse, satellites);
     }
 #endif
+
+void SerialReceiver::telemetryWriteCustomFrame(uint8_t frameType, uint8_t *bff, uint8_t length)
+  {
+        telemetry->setCustomFrameData(frameType, bff, length);
+ }
+
+
+
+
+
 #endif
 } // namespace serialReceiverLayer

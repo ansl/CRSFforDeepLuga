@@ -363,4 +363,11 @@ namespace sketchLayer
         (void)satellites;
 #endif
     }
+
+    void CRSFforArduino::telemetryWriteCustomFrame(uint8_t frameType, uint8_t *bff, uint8_t length)
+    {
+#if CRSF_TELEMETRY_ENABLED > 0 
+        this->SerialReceiver::telemetryWriteCustomFrame(frameType, bff, length);
+#endif
+    }
 } // namespace sketchLayer

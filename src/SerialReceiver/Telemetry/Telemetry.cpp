@@ -78,8 +78,8 @@ namespace serialReceiverLayer
 #if CRSF_TELEMETRY_ENABLED > 0 && CRSF_TELEMETRY_HEARTBEAT_ENABLED > 0
         _telemetryFrameSchedule[index++] = (1 << CRSF_TELEMETRY_FRAME_HEARTBEAT_INDEX);
 #endif
-#if CRSF_TELEMETRY_ENABLED > 0 
-        _telemetryFrameSchedule[index++] = (1 << CRSF_TELEMETRY_FRAME_RX_ANSWER_INDEX);
+#if CRSF_TELEMETRY_ENABLED > 0 && CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED>0
+        _telemetryFrameSchedule[index++] = (1 << CRSF_TELEMETRY_FRAME_CUSTOM_FRAME_INDEX);
 #endif
 
         _telemetryFrameScheduleCount = index;
@@ -156,11 +156,11 @@ namespace serialReceiverLayer
             sendFrame = true;
         }
         #endif
-#if CRSF_TELEMETRY_RX_ANSWER_ENABLED > 0
-        if (currentSchedule & (1 << CRSF_TELEMETRY_FRAME_HEARTBEAT_INDEX))
+#if CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0 
+        if (currentSchedule & (1 << CRSF_TELEMETRY_FRAME_CUSTOM_FRAME_INDEX))
         {
             _initialiseFrame();
-            _appendRxAnswerData();
+            _appendCustomFrameData();
             _finaliseFrame();
             sendFrame = true;
         }
@@ -246,6 +246,16 @@ namespace serialReceiverLayer
         (void)satellites;
 #endif
     }
+
+
+    void Telemetry::setCustomFrameData(uint8_t frameType, uint8_t *bff, uint8_t length)
+        {
+    #if CRSF_TELEMETRY_ENABLED > 0 && CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED > 0
+        memcpy(_telemetryData.customFrame.FRAME.raw, bff, length);
+        _telemetryData.customFrame.length = length;
+
+    #endif
+        }
 
     void Telemetry::sendTelemetryData(HardwareSerial *db)
     {
@@ -340,8 +350,9 @@ namespace serialReceiverLayer
         SerialBuffer::writeU8(CRSF_FRAMETYPE_HEARTBEAT);
         SerialBuffer::writeU8(CRSF_ADDRESS_FLIGHT_CONTROLLER);
     }
-      void Telemetry::_appendRxAnswerData()//luengoa
+      void Telemetry::_appendCustomFrameData()//luengoa
     {
+         SerialBuffer::writeByteArray(_telemetryData.customFrame.FRAME.raw,_telemetryData.customFrame.length);
    
     }
     void Telemetry::_finaliseFrame()

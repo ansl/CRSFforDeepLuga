@@ -150,13 +150,13 @@ namespace crsfProtocol
     typedef enum
     {
         CRSF_TELEMETRY_FRAME_START_INDEX = 0,
-        CRSF_TELEMETRY_FRAME_ATTITUDE_INDEX,
-        CRSF_TELEMETRY_FRAME_BARO_ALTITUDE_INDEX,
+        // CRSF_TELEMETRY_FRAME_ATTITUDE_INDEX,
+        // CRSF_TELEMETRY_FRAME_BARO_ALTITUDE_INDEX,
         CRSF_TELEMETRY_FRAME_BATTERY_SENSOR_INDEX,
         CRSF_TELEMETRY_FRAME_FLIGHT_MODE_INDEX,
         CRSF_TELEMETRY_FRAME_GPS_INDEX,
-        CRSF_TELEMETRY_FRAME_HEARTBEAT_INDEX,
-        CRSF_TELEMETRY_FRAME_RX_ANSWER_INDEX,
+        // CRSF_TELEMETRY_FRAME_HEARTBEAT_INDEX,
+        CRSF_TELEMETRY_FRAME_CUSTOM_FRAME_INDEX,
         // CRSF_TELEMETRY_FRAME_VARIO_INDEX,
         CRSF_TELEMETRY_FRAME_SCHEDULE_MAX
     } telemetryFrame_t;
@@ -257,6 +257,12 @@ namespace crsfProtocol
         uint8_t satellites;
     } gpsData_t;
 
+    typedef struct customFrame_s
+    {
+        frame_u FRAME;
+        uint8_t length;
+    } customFrame_t;
+
     // Struct to hold data for the telemetry frame.
     typedef struct telemetryData_s
     {
@@ -265,6 +271,7 @@ namespace crsfProtocol
         batterySensorData_t battery;
         flightModeData_t flightMode;
         gpsData_t gps;
+        customFrame_t customFrame;
     } telemetryData_t;
 
     enum baudRate_e

@@ -104,7 +104,7 @@ and assign them to a switch on your controller. */
 
 #define CRSF_LINK_STATISTICS_ENABLED 1
 
-#define CRSF_TELEMETRY_RX_ANSWER_ENABLED 1
+#define CRSF_TELEMETRY_CUSTOM_FRAME_ENABLED 1
 
 /* Debug Options
 - DEBUG_ENABLED: Enables or disables debug output over the selected serial port.
