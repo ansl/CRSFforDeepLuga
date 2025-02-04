@@ -141,11 +141,11 @@ namespace serialReceiverLayer
                     const uint8_t crc = calculateFrameCRC();
                     if (rxFrame.frame.type != CRSF_FRAMETYPE_RC_CHANNELS_PACKED && rxFrame.frame.type != CRSF_FRAMETYPE_LINK_STATISTICS)
                     {
-                        for (int i = 0; i < fullFrameLength; i++)
-                        {
-                            Serial.printf("%X ", rxFrame.raw[i]);
-                        }
-                        Serial.println();
+                        // for (int i = 0; i < fullFrameLength; i++)
+                        // {
+                        //     Serial.printf("%X ", rxFrame.raw[i]);
+                        // }
+                        // Serial.println();
                     }
 
                     if (crc == rxFrame.raw[fullFrameLength - 1])
@@ -180,7 +180,7 @@ namespace serialReceiverLayer
 
                             default:
                                 memcpy(&customFrameFrame, &rxFrame, CRSF_FRAME_SIZE_MAX);
-                                Serial.printf("RRReceived FRAME %X received\n", rxFrame.frame.type); //luengoa
+                                // Serial.printf("Received FRAME %X received\n", rxFrame.frame.type); //luengoa
                                 customFrameReceived = true;
                         }
                     }
