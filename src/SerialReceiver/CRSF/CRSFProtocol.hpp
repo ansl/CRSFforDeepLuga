@@ -117,11 +117,11 @@ namespace crsfProtocol
         CRSF_FRAMETYPE_MSP_WRITE = 0x7C,
         CRSF_FRAMETYPE_DISPLAYPORT_CMD = 0x7D,
         
-        CRSF_FRAMETYPE_BARBUS_ACK       = 0xC0, // [sync] [len] [0xAF] [COMMAND to ACK] [CHUNK_N][payload] [crc8]
-        CRSF_FRAMETYPE_BARBUS_SEND_AREA = 0xC1, //-- [sync] [len] [0xAD] [Total Chucks] [chuckN] [ncoords] [coord 1 LAT Coord 1 LON].....................[coord n LAT Coord n LON] [crc8]
-        CRSF_FRAMETYPE_BARBUS_SEND_HOME = 0xC2, //-- [sync] [len] [0xAE] [COORD TYPE 0:HOME 1:MARK][coord LAT Coord LON][crc8]
-        CRSF_FRAMETYPE_BARBUS_SEND_MARK = 0xC3, //-- [sync] [len] [0xAE] [COORD TYPE 0:HOME 1:MARK][coord LAT Coord LON][crc8]
-        CRSF_FRAMETYPE_BARBUS_COMMAND   = 0xCA //-- [sync] [len] [0xCA] [COMMAND] [payload] [crc8]
+        CRSF_FRAMETYPE_BARBUS_ACK       = 0xC0, // [sync] [len] [0xC0] [COMMAND to ACK] [CHUNK_N][payload] [crc8]
+        CRSF_FRAMETYPE_BARBUS_SEND_AREA = 0xC1, //-- [sync] [len] [0xC1] [DEST] [ORIG]  [Total Chucks] [chuckN] [coord 1 LAT Coord 1 LON].....................[coord n LAT Coord n LON] [crc8]
+        CRSF_FRAMETYPE_BARBUS_SEND_HOME = 0xC2, //-- [sync] [len] [0xC2] [DEST] [ORIG]  [Total Chucks] [chuckN] [coord LAT Coord LON][crc8]
+        CRSF_FRAMETYPE_BARBUS_SEND_MARK = 0xC3, //-- [sync] [len] [0xC3] [DEST] [ORIG]  [Total Chucks] [chuckN] [coord LAT Coord LON][crc8]
+        CRSF_FRAMETYPE_BARBUS_COMMAND   = 0xCA //-- [sync] [len] [0xCA] [DEST] [ORIG]  [COMMAND] [payload] [crc8]
         
     } frameType_t;
 

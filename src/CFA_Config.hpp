@@ -60,9 +60,15 @@ See https://semver.org/ for more information. */
 - RC_INITIALISE_THROTTLECHANNEL: When enabled, the throttle channel is set to its minimum value. */
 #define CRSF_RC_ENABLED                    1
 #define CRSF_RC_MAX_CHANNELS               16
-#define CRSF_RC_CHANNEL_MIN                172
+#ifndef CRSF_RC_CHANNEL_MIN
+  #define CRSF_RC_CHANNEL_MIN                172
+#endif
+#ifndef CRSF_RC_CHANNEL_MAX
 #define CRSF_RC_CHANNEL_MAX                1811
+#endif
+#ifndef CRSF_RC_CHANNEL_CENTER
 #define CRSF_RC_CHANNEL_CENTER             992
+#endif
 #define CRSF_RC_INITIALISE_CHANNELS        1
 #define CRSF_RC_INITIALISE_ARMCHANNEL      1
 #define CRSF_RC_INITIALISE_THROTTLECHANNEL 1
