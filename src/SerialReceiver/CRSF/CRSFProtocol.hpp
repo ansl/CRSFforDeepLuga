@@ -125,6 +125,16 @@ namespace crsfProtocol
         
     } frameType_t;
 
+    typedef enum barbusCommand_e
+    {
+        COMMAND_BARBUS_G2H = 0x01,
+        COMMAND_BARBUS_G2M = 0x02,
+        COMMAND_BARBUS_START_NAV = 0x11,
+        COMMAND_BARBUS_STOP_NAV = 0x12,
+        COMMAND_BARBUS_RESUME_NAV = 0x13,
+        COMMAND_BARBUS_END_NAV = 0x14
+    }barbusCommand_t;
+
 #if CRSF_TELEMETRY_ENABLED == 1 || CRSF_LINK_STATISTICS_ENABLED == 1
 #define CRSF_FRAME_ORIGIN_DEST_SIZE 2
 #endif
