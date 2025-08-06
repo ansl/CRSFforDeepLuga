@@ -76,7 +76,8 @@ namespace crsfProtocol
         CRSF_FRAME_LINK_STATISTICS_PAYLOAD_SIZE = 10,
         CRSF_FRAME_LINK_STATISTICS_TX_PAYLOAD_SIZE = 6,
         CRSF_FRAME_RC_CHANNELS_PAYLOAD_SIZE = 22,
-        CRSF_FRAME_ATTITUDE_PAYLOAD_SIZE = 6
+        CRSF_FRAME_ATTITUDE_PAYLOAD_SIZE = 6,
+        CRSF_FRAME_BARBUS_SEND_PERIMETER_PAYLOAD_SIZE= CRSF_PAYLOAD_SIZE_MAX +2-21
     };
 
     enum frameLength_e
@@ -121,6 +122,8 @@ namespace crsfProtocol
         CRSF_FRAMETYPE_BARBUS_SEND_AREA = 0xC1, //-- [sync] [len] [0xC1] [DEST] [ORIG]  [Total Chucks] [chuckN] [coord 1 LAT Coord 1 LON].....................[coord n LAT Coord n LON] [crc8]
         CRSF_FRAMETYPE_BARBUS_SEND_HOME = 0xC2, //-- [sync] [len] [0xC2] [DEST] [ORIG]  [Total Chucks] [chuckN] [coord LAT Coord LON][crc8]
         CRSF_FRAMETYPE_BARBUS_SEND_MARK = 0xC3, //-- [sync] [len] [0xC3] [DEST] [ORIG]  [Total Chucks] [chuckN] [coord LAT Coord LON][crc8]
+        // CRSF_FRAMETYPE_BARBUS_SEND_PERIMETER = 0xC4, //-- [sync] [len] [0xC4] [DEST] [ORIG]  [Total Chucks] [chuckN] [coord 1 LAT Coord 1 LON].....................[coord n LAT Coord n LON] [crc8]
+        CRSF_FRAMETYPE_BARBUS_SEND_PATH = 0xC4, //-- [sync] [len] [0xC4] [DEST] [ORIG]  [Total Chucks] [chuckN] [coord 1 LAT Coord 1 LON] [cellsize].....................[coord n LAT Coord n LON] [crc8]
         CRSF_FRAMETYPE_BARBUS_COMMAND   = 0xCA //-- [sync] [len] [0xCA] [DEST] [ORIG]  [COMMAND] [payload] [crc8]
         
     } frameType_t;
